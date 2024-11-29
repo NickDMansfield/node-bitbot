@@ -1,0 +1,23 @@
+{
+  "name": "bitbot",
+  "version": "1.0.0",
+  "description": "stack them racks on the auto-mat",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/nickdmansfield/node-bitbot.git"
+  },
+  "author": "Nicholas Mansfield",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/nickdmansfield/node-bitbot/issues"
+  },
+  "homepage": "https://github.com/nickdmansfield/node-bitbot#readme",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1"
+  }
+}
