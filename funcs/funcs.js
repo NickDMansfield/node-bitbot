@@ -19,7 +19,8 @@ module.exports = {
         const lastRecord = sortedRecords[sortedRecords.length - 1];
 
         // Begin the step-by-step iterations
-        return historyRecords.map(rec => this.calculateAcceleration(rec, lastRecord));
+        //  We skip the last one because we need at least two records to compar
+        return historyRecords.slice(0,historyRecords.length-1).map(rec => this.calculateAcceleration(rec, lastRecord));
     },
 
     calculateAcceleration (initialRecord, recentRecord) {
