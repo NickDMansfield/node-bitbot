@@ -25,9 +25,7 @@ module.exports = {
     calculateAcceleration (initialRecord, recentRecord) {
 
         // Calculate the totalTime
-        //  We use a +1 because hourly records aren't truly subtractive. 18:00-22:00 is technically five hours
-        //      because it only measures the start of the hour
-        const totalTime = moment(recentRecord.createdAt).diff(moment(initialRecord.createdAt), 'hours') + 1;
+        const totalTime = moment(recentRecord.createdAt).diff(moment(initialRecord.createdAt), 'hours');
         // Calculate the totalGrowth
         const totalGrowth = recentRecord.price - initialRecord.price;
         // Calculate the totalGrowthPercent

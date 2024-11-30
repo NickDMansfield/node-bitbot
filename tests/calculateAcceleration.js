@@ -13,10 +13,10 @@ describe('calculateAcceleration', function () {
         { symbol: 'LTC', price: 215, createdAt: '2023-10-05T22:02:15.556595' }
       ];
       const expectedResults = {
-        growthRate: 0.015, // 1.5%
+        growthRate: 0.01875, // 1.5%
         totalGrowthPercent: 0.075, //7.5%
         totalGrowth: 15,
-        totalTime: 5
+        totalTime: 4
       };
       const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
       assert.equal(results.growthRate, expectedResults.growthRate);
@@ -34,10 +34,10 @@ describe('calculateAcceleration', function () {
         { symbol: 'LTC', price: 150, createdAt: '2023-10-05T22:02:15.556595' }
       ];
       const expectedResults = {
-        growthRate: -0.05, // -2%
+        growthRate: -0.0625, // -2%
         totalGrowthPercent: -0.25, // -10%
         totalGrowth: -50,
-        totalTime: 5
+        totalTime: 4
       };
       const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
       assert.equal(results.growthRate, expectedResults.growthRate);
