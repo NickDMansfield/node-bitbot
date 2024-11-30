@@ -19,10 +19,22 @@ describe('calculateAcceleration', function () {
         totalTime: 4
       };
       const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
-      assert.equal(results.growthRate, expectedResults.growthRate);
-      assert.equal(results.totalGrowthPercent, expectedResults.totalGrowthPercent);
-      assert.equal(results.totalGrowth, expectedResults.totalGrowth);
-      assert.equal(results.totalTime, expectedResults.totalTime);
+      analyzeResults(results, expectedResults);
+    });
+
+    it('should return proper calculations on a BIG profit', function () {
+      const mockHistory = [
+        { symbol: 'LTC', price: 100, createdAt: '2023-10-05T18:02:15.556595' },
+        { symbol: 'LTC', price: 400, createdAt: '2023-10-05T20:02:15.556595' }
+      ];
+      const expectedResults = {
+        growthRate: 1.50,
+        totalGrowthPercent: 3.00, //300%
+        totalGrowth: 300,
+        totalTime: 2
+      };
+      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
+      analyzeResults(results, expectedResults);
     });
 
     it('should return proper calculations on loss', function () {
@@ -40,10 +52,14 @@ describe('calculateAcceleration', function () {
         totalTime: 4
       };
       const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
-      assert.equal(results.growthRate, expectedResults.growthRate);
-      assert.equal(results.totalGrowthPercent, expectedResults.totalGrowthPercent);
-      assert.equal(results.totalGrowth, expectedResults.totalGrowth);
-      assert.equal(results.totalTime, expectedResults.totalTime);
+      analyzeResults(results, expectedResults);
     });
   });
 });
+
+const analyzeResults = (results, expectedResults) => {
+  assert.equal(results.growthRate, expectedResults.growthRate);
+  assert.equal(results.totalGrowthPercent, expectedResults.totalGrowthPercent);
+  assert.equal(results.totalGrowth, expectedResults.totalGrowth);
+  assert.equal(results.totalTime, expectedResults.totalTime);
+}
