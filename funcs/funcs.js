@@ -37,7 +37,7 @@ module.exports = {
         (recentRecord.price - initialRecord.price) / initialRecord.price
         :
         // this handles losses
-        // 200                  150                     200 => -0.75
+        // 200                  150                     -200 => -0.75
         (initialRecord.price - recentRecord.price) / -initialRecord.price;
 
         const growthRate = totalGrowthPercent/totalTime;
