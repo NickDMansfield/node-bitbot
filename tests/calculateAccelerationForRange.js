@@ -36,8 +36,8 @@ describe('calculateAccelerationForRange', function () {
         let curResult = results[idx];
         // assert.equal(curResult.growthRate, expectedResults[idx].growthRate);
         // assert.equal(curResult.totalGrowthPercent, expectedResults[idx].totalGrowthPercent);
-        assert.equal(curResult.totalGrowth.toFixed(4), expectedResults[idx].totalGrowth.toFixed(4));
-        assert.equal(curResult.totalTime.toFixed(4), expectedResults[idx].totalTime.toFixed(4));
+        assert.equal(curResult.totalGrowth.toFixed(8), expectedResults[idx].totalGrowth.toFixed(8));
+        assert.equal(curResult.totalTime.toFixed(8), expectedResults[idx].totalTime.toFixed(8));
       }
     });
 
@@ -70,10 +70,10 @@ describe('calculateAccelerationForRange', function () {
       const results = funcs.calculateAccelerationForRange(mockHistory);
       for (let idx in expectedResults) {
         let curResult = results[idx];
-        // assert.equal(curResult.growthRate, expectedResults[idx].growthRate);
-        // assert.equal(curResult.totalGrowthPercent, expectedResults[idx].totalGrowthPercent);
-        assert.equal(curResult.totalGrowth.toFixed(4), expectedResults[idx].totalGrowth.toFixed(4));
-        assert.equal(curResult.totalTime.toFixed(4), expectedResults[idx].totalTime.toFixed(4));
+        // assert.equal(curResult.growthRate.toFixed(8), expectedResults[idx].growthRate.toFixed(8));
+        // assert.equal(curResult.totalGrowthPercent.toFixed(8), expectedResults[idx].totalGrowthPercent.toFixed(8));
+        assert.equal(curResult.totalGrowth.toFixed(8), expectedResults[idx].totalGrowth.toFixed(8));
+        assert.equal(curResult.totalTime.toFixed(8), expectedResults[idx].totalTime.toFixed(8));
       }
     });
   });

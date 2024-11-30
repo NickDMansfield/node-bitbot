@@ -15,7 +15,6 @@ module.exports = {
         const sortedRecords = _.sortBy(historyRecords, 'createdAt', 'ASC');
 
         // Store the first and last record
-        const firstRecord = sortedRecords[0];
         const lastRecord = sortedRecords[sortedRecords.length - 1];
 
         // Begin the step-by-step iterations
@@ -32,7 +31,14 @@ module.exports = {
         // Calculate the totalGrowth
         const totalGrowth = recentRecord.price - initialRecord.price;
         // Calculate the totalGrowthPercent
-        const totalGrowthPercent = (initialRecord.price - recentRecord.price) / -initialRecord.price;
+        const totalGrowthPercent = recentRecord.price > initialRecord.price ?
+        // profits
+        // 200                  220                     200 => 0.1
+        (recentRecord.price - initialRecord.price) / initialRecord.price
+        :
+        // this handles losses
+        // 200                  150                     200 => -0.75
+        (initialRecord.price - recentRecord.price) / -initialRecord.price;
 
         const growthRate = totalGrowthPercent/totalTime;
         return {
