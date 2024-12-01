@@ -7,9 +7,6 @@ describe('calculateAcceleration', function () {
     it('should return proper calculations on profit', function () {
       const mockHistory = [
         { symbol: 'LTC', price: 200, createdAt: '2023-10-05T18:02:15.556595' },
-        { symbol: 'LTC', price: 200.22, createdAt: '2023-10-05T19:02:15.556595' },
-        { symbol: 'LTC', price: 206.40, createdAt: '2023-10-05T20:02:15.556595' },
-        { symbol: 'LTC', price: 210.00, createdAt: '2023-10-05T21:02:15.556595' },
         { symbol: 'LTC', price: 215, createdAt: '2023-10-05T22:02:15.556595' }
       ];
       const expectedResults = {
@@ -18,7 +15,7 @@ describe('calculateAcceleration', function () {
         totalGrowth: 15,
         totalTime: 4
       };
-      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
+      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
       analyzeResults(results, expectedResults);
     });
 
@@ -37,12 +34,24 @@ describe('calculateAcceleration', function () {
       analyzeResults(results, expectedResults);
     });
 
+    it('should return proper calculations on a simple profit', function () {
+      const mockHistory = [
+        { symbol: 'LTC', price: 100, createdAt: '2023-10-05T18:02:15.556595' },
+        { symbol: 'LTC', price: 110, createdAt: '2023-10-05T19:02:15.556595' }
+      ];
+      const expectedResults = {
+        growthRate: 0.1,
+        totalGrowthPercent: 0.1,
+        totalGrowth: 10,
+        totalTime: 1
+      };
+      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
+      analyzeResults(results, expectedResults);
+    });
+
     it('should return proper calculations on loss', function () {
       const mockHistory = [
         { symbol: 'LTC', price: 200, createdAt: '2023-10-05T18:02:15.556595' },
-        { symbol: 'LTC', price: 197.11, createdAt: '2023-10-05T19:02:15.556595' },
-        { symbol: 'LTC', price: 180.40, createdAt: '2023-10-05T20:02:15.556595' },
-        { symbol: 'LTC', price: 171.00, createdAt: '2023-10-05T21:02:15.556595' },
         { symbol: 'LTC', price: 150, createdAt: '2023-10-05T22:02:15.556595' }
       ];
       const expectedResults = {
@@ -51,9 +60,25 @@ describe('calculateAcceleration', function () {
         totalGrowth: -50,
         totalTime: 4
       };
-      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[4]);
+      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
       analyzeResults(results, expectedResults);
     });
+
+    it('should return proper calculations on a simple loss', function () {
+      const mockHistory = [
+        { symbol: 'LTC', price: 100, createdAt: '2023-10-05T18:02:15.556595' },
+        { symbol: 'LTC', price: 90, createdAt: '2023-10-05T19:02:15.556595' }
+      ];
+      const expectedResults = {
+        growthRate: -0.1,
+        totalGrowthPercent: -0.1,
+        totalGrowth: -10,
+        totalTime: 1
+      };
+      const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
+      analyzeResults(results, expectedResults);
+    });
+
   });
 });
 
