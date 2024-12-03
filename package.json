@@ -4,7 +4,7 @@
   "description": "stack them racks on the auto-mat",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./tests",
+    "test": "mocha ./unit-tests",
     "retro": "mocha ./retroTesting"
   },
   "repository": {

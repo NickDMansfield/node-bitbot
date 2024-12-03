@@ -78,7 +78,6 @@ describe('calculateAcceleration', function () {
       const results = funcs.calculateAcceleration(mockHistory[0], mockHistory[1]);
       analyzeResults(results, expectedResults);
     });
-
   });
 });
 
