@@ -23,4 +23,9 @@ describe('SafeSwing', function () {
     });
 
   });
+  describe('Success states', function() {
+    it('should return proper values on a basic happy path', function () {
+      assert.equal([1, 2, 3].indexOf(4), 99);
+    });
+  })
 });
