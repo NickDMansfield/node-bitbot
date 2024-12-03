@@ -12,6 +12,7 @@
 */
 
 const _ = require('lodash');
+const funcs = require('../funcs/funcs');
 
 module.exports = {
     processData (processSettings, priceHistory, purchaseHistory) {
@@ -25,6 +26,7 @@ module.exports = {
         if (!priceHistory || !Array.isArray(priceHistory)) {
             throw new Error('You must provide a priceHistory array arg');
         }
+        // processSettings tests
         if (!processSettings) {
             throw new Error('You must provide a processSettings arg object');
         }
@@ -33,19 +35,44 @@ module.exports = {
         const firstRecord = sortedPriceHistory[0];
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
         const currentPrice = lastRecord.price;
-        const averagePrice = _.sumBy(purchaseHistory, 'price')/purchaseHistory.length;
+        const totalSymbolAmount = _.sumBy(purchaseHistory, 'quantity');
+        const totalSymbolCost = _.sumBy(purchaseHistory, 'price');
+        const currentTotalEquity = totalSymbolAmount * currentPrice;
+        const averagePrice = totalSymbolCost/purchaseHistory.length;
 
         let amountToSell = 0;
         let amountToBuy = 0;
+        let shouldBuy = false;
+        let shouldSell = false;
+        let limitOrdersToSet = []
 
+        if (currentPrice > averagePrice) {
+            if (processSettings.minimumProfitPercentToSell) {
+                const currentProfitPercent = (currentPrice / averagePrice) - 1; // 0.1 = 10%
+                if (currentProfitPercent >= processSettings.minimumProfitPercentToSell) {
+                    amountToSell = currentTotalEquity;
+                    shouldSell = true;
+                    
+                    //  Determine if a short is necessary
+                    //      In this case we always short
+                    const shortBuyPrice = funcs.calculateShortValue(priceHistory, { ...processSettings, currentPrice, averagePrice });
+                    limitOrdersToSet.push( {
+                        symbol: processSettings.symbol,
+                        // This is not a typo. We are moving the entire position
+                        amountToBuy: amountToSell,
+                        price: shortBuyPrice
+                    });
+                }
+            }
+        }
 
         return {
-            shouldBuy: false,
-            shouldSell: false,
+            shouldBuy,
+            shouldSell,
             amountToBuy,
             amountToSell,
             // these should probably be run after the 'manual' transactions
-            limitOrdersToSet: [],
+            limitOrdersToSet,
             estimatedCost: currentPrice * amountToBuy,
             symbol: processSettings.symbol,
         };

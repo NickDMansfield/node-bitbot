@@ -38,5 +38,34 @@ module.exports = {
             totalGrowthPercent,
             growthRate
         }
+    },
+
+    calculateShortValue (priceHistory, processSettings) {
+
+        
+        const weeklyLow = _.chain(priceHistory)
+        .filter(obj => moment(obj.createdAt).isAfter(moment().subtract(7, 'days')))
+        .minBy('price')
+        .get('price', null)
+        .value();
+        
+        // Determine short price
+
+        let shortBuyPrice = weeklyLow;
+        // Sometimes we may want to use the current price instead of the average for adjustments.
+        //  This allows for a more swing-heavy micro-ier strategy
+        let shortBaseValue = processSettings.useCurrentPriceForAdjustment ? processSettings.currentPrice : processSettings.averagePrice;
+
+        // lmao this is one mfin long variable name
+        let shortReductionPercentAdjustedBuyPrice = null;
+        if (processSettings.shortAdjustmentModifier) {
+            // This is a multiplier, so a 5% ease up on the short would be 1.05 and a 3% reduction would be 0.97
+            shortReductionPercentAdjustedBuyPrice = shortBaseValue * processSettings.shortAdjustmentModifier;
+            //  We allow an override in case you want to use a more aggressive upswing on crabbing
+            if (processSettings.overrideWeeklyLow || weeklyLow < shortReductionPercentAdjustedBuyPrice) {
+                shortBuyPrice = shortReductionPercentAdjustedBuyPrice;
+            }
+        } 
+        return shortBuyPrice;
     }
 }

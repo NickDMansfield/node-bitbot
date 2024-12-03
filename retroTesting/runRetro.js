@@ -1,3 +1,18 @@
+/*
+    The purpose of this is to run retro tests against past data to analyze the viability of trading strats.
+        This class can be called independently or from the retroTests test. The latter is used to run against 
+        a series of datasets to get some testing against multiple patterns and coin types (altcoins, memecoins, stablecoins etc)
+
+    The shorthand purpose is to run the analyzer on each loop as though the loop were a new period, then use the analyzer's 
+        data to take appropriate action (buy, sell, limit, etc).  It tracks the running totals as the time goes on and outputs a final report.
+        This is not part of the actual purchase process.  The data analytics are handled in the processData functions. 
+        This is just a simulator script to manage the retro testing
+
+
+
+*/
+
+
 const _ = require('lodash');
 const philosophy = require('../philosophies/index');
 
@@ -59,6 +74,8 @@ module.exports = {
             runningPriceHistory.push(curPriceRecord);
             const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);
             analyzedHistories.push(analyzedRecord);
+
+            // Handle the new results
         }
         
         let finalLiquid = 0;
