@@ -66,8 +66,14 @@ describe('testRetroActively', function () {
 
       it('should throw an error when no philosophy is provided in the retro settings', function () {
         assert.throws(() => {
-          testRetroactively([], [{}], { initialLiquid: 10000 }); 
+          testRetroactively([], [{}], { initialLiquid: 10000, initialSymbolAmount: 0 }); 
         }, Error('retroSettings MUST have a philosophy string property'));
+      });
+
+      it('should throw an error when no initialSymbolAmount is provided in the retro settings', function () {
+        assert.throws(() => {
+          testRetroactively([], [{}], { initialLiquid: 10000 }); 
+        }, Error('No initialSymbolAmount value provided in retroSettings'));
       });
   
     })
@@ -87,33 +93,42 @@ describe('testRetroActively', function () {
       const retroSettings = {
         initialLiquid: 10000,
         symbol: 'LTC',
-        philosophy: 'safeSwing'
+        philosophy: 'safeSwing',
+        initialSymbolAmount: 1,
+        minimumProfitPercentToSell: 0.1,
+        shortAdjustmentModifier: 0.99
       };
+
+      const purchaseHistory = [
+        { price: 199, quantity: 1 }
+      ];
+
       const expectedOutput = {
         symbol: 'LTC',
         initialLiquid: 10000,
         initialPositions: [],
         initialPrice: 200,
         finalLiquid: 10230,
-        finalPositions: [],
+        // finalPositions: [],
         finalPrice: 230,
         symbolTotal: 0,
-        symbolTotalInUSD: 10230,
-        totalGrowth: 230,
-        totalGrowthPercent: 0.023
+        symbolTotalInUSD: 0,
+        totalGrowth: 30,
+        totalGrowthPercent: 1.003
       };
-      const result = testRetroactively([{}], mockHistory, retroSettings);
+      const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
       assert.equal(result.symbol, expectedOutput.symbol);
       assert.equal(result.initialLiquid, expectedOutput.initialLiquid);
       // assert.equal(result.initialPositions, expectedOutput.initialPositions);
       assert.equal(result.initialPrice, expectedOutput.initialPrice);
       assert.equal(result.finalLiquid, expectedOutput.finalLiquid);
-      assert.equal(result.finalPositions, expectedOutput.finalPositions);
+      // assert.equal(result.finalPositions, expectedOutput.finalPositions);
       assert.equal(result.finalPrice, expectedOutput.finalPrice);
       assert.equal(result.symbolTotal, expectedOutput.symbolTotal);
       assert.equal(result.symbolTotalInUSD, expectedOutput.symbolTotalInUSD);
       assert.equal(result.totalGrowth, expectedOutput.totalGrowth);
-      assert.equal(result.totalGrowthPercent, expectedOutput.totalGrowthPercent);
+      // This is to round up, since we get a wacky long decimal which just rounds to the approximate 1.003 anywho
+      assert.equal(Math.round(result.totalGrowthPercent * 1000)/1000, expectedOutput.totalGrowthPercent);
     });
   });
 });

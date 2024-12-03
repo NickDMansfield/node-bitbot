@@ -45,6 +45,9 @@ module.exports = {
         if (retroSettings.initialLiquid === undefined || retroSettings.initialLiquid === null) {
             throw new Error('No initialLiquid value provided in retroSettings');
         }
+        if (retroSettings.initialSymbolAmount === undefined || retroSettings.initialSymbolAmount === null) {
+            throw new Error('No initialSymbolAmount value provided in retroSettings');
+        }
         if (!retroSettings.philosophy || typeof retroSettings.philosophy !== 'string') {
             throw new Error('retroSettings MUST have a philosophy string property')
         }
@@ -59,14 +62,25 @@ module.exports = {
 
         const sortedPriceHistory = _.sortBy(priceHistoryToAnalyze, 'createdAt', 'ASC');
         const firstRecord = sortedPriceHistory[0];
+        const initialPrice = firstRecord.price;
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
 
         const runningPriceHistory = [];
         const analyzedHistories = [];
 
         const processSettings = {
-            symbol: retroSettings.symbol
+            symbol: retroSettings.symbol,
+            minimumProfitPercentToSell: retroSettings.minimumProfitPercentToSell,
+            useCurrentPriceForAdjustment: retroSettings.useCurrentPriceForAdjustment,
+            overrideWeeklyLow: retroSettings.overrideWeeklyLow,
+            shortAdjustmentModifier: retroSettings.shortAdjustmentModifier
         };
+        
+        let finalLiquid = retroSettings.initialLiquid;
+        let finalPositions = [];
+        let symbolTotal = retroSettings.initialSymbolAmount;
+        let totalGrowth = 0;
+        let totalGrowthPercent = 0;
 
         // simulates the stream of data records. 
         //  Thank goodness for sample data
@@ -76,26 +90,35 @@ module.exports = {
             analyzedHistories.push(analyzedRecord);
 
             // Handle the new results
+            if (analyzedRecord.shouldSell) {
+                // This is where we would make an API call if it were a real system
+                finalLiquid += analyzedRecord.estimatedRevenue;
+                symbolTotal -= analyzedRecord.amountToSell;
+            }
         }
-        
-        let finalLiquid = 0;
-        let finalPositions = [];
-        let symbolTotal = 0;
-        let totalGrowth = 0;
-        let totalGrowthPercent = 0;
 
+        // package up and present the data
+        const totalLiquidGrowth = finalLiquid - retroSettings.initialLiquid;
+        const totalSymbolGrowth = symbolTotal - retroSettings.initialSymbolAmount;
+        const finalSymbolEquity = symbolTotal * lastRecord.price;
+        const initialSymbolEquity = retroSettings.initialSymbolAmount * initialPrice;
+        const finalTotalEquity = finalSymbolEquity + finalLiquid;
+        const initialTotalEquity = initialSymbolEquity + retroSettings.initialLiquid;
+
+        totalGrowth = finalTotalEquity - initialTotalEquity;
+        totalGrowthPercent = finalTotalEquity / initialTotalEquity // This is a multiple, (ie 1.05 for 5%)
 
         return {
             symbol: retroSettings.symbol,
             initialLiquid: retroSettings.initialLiquid,
             // TODO: figure out if this is actually different conceptually from the purchaseHistory 
             // initialPositions: [],
-            initialPrice: firstRecord.price,
+            initialPrice,
             finalLiquid,
-            finalPositions,
+            // finalPositions,
             finalPrice: lastRecord.price,
             symbolTotal,
-            symbolTotalInUSD: symbolTotal * lastRecord.price,
+            symbolTotalInUSD: finalSymbolEquity,
             totalGrowth,
             totalGrowthPercent
         }

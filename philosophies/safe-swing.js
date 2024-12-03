@@ -35,8 +35,8 @@ module.exports = {
         const firstRecord = sortedPriceHistory[0];
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
         const currentPrice = lastRecord.price;
-        const totalSymbolAmount = _.sumBy(purchaseHistory, 'quantity');
-        const totalSymbolCost = _.sumBy(purchaseHistory, 'price');
+        const totalSymbolAmount = _.sumBy(purchaseHistory, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
+        const totalSymbolCost = _.sumBy(purchaseHistory, ph => Number.isNaN(ph.price) ? 0 : ph.price);
         const currentTotalEquity = totalSymbolAmount * currentPrice;
         const averagePrice = totalSymbolCost/purchaseHistory.length;
 
@@ -50,7 +50,7 @@ module.exports = {
             if (processSettings.minimumProfitPercentToSell) {
                 const currentProfitPercent = (currentPrice / averagePrice) - 1; // 0.1 = 10%
                 if (currentProfitPercent >= processSettings.minimumProfitPercentToSell) {
-                    amountToSell = currentTotalEquity;
+                    amountToSell = totalSymbolAmount;
                     shouldSell = true;
                     
                     //  Determine if a short is necessary
@@ -74,6 +74,7 @@ module.exports = {
             // these should probably be run after the 'manual' transactions
             limitOrdersToSet,
             estimatedCost: currentPrice * amountToBuy,
+            estimatedRevenue: currentPrice * amountToSell,
             symbol: processSettings.symbol,
         };
     }
