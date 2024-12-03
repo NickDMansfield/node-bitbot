@@ -63,6 +63,12 @@ describe('testRetroActively', function () {
           testRetroactively([], [{}], {}); 
         }, Error('No initialLiquid value provided in retroSettings'));
       });
+
+      it('should throw an error when no philosophy is provided in the retro settings', function () {
+        assert.throws(() => {
+          testRetroactively([], [{}], { initialLiquid: 10000 }); 
+        }, Error('retroSettings MUST have a philosophy string property'));
+      });
   
     })
   });
@@ -81,6 +87,7 @@ describe('testRetroActively', function () {
       const retroSettings = {
         initialLiquid: 10000,
         symbol: 'LTC',
+        philosophy: 'safeSwing'
       };
       const expectedOutput = {
         symbol: 'LTC',

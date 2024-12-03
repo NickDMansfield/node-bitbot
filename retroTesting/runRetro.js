@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const philosophy = require('../philosophies/index');
 
 module.exports = {
     testRetroactively (purchaseHistoryForSymbol, priceHistoryToAnalyze, retroSettings) {
@@ -29,16 +30,43 @@ module.exports = {
         if (retroSettings.initialLiquid === undefined || retroSettings.initialLiquid === null) {
             throw new Error('No initialLiquid value provided in retroSettings');
         }
+        if (!retroSettings.philosophy || typeof retroSettings.philosophy !== 'string') {
+            throw new Error('retroSettings MUST have a philosophy string property')
+        }
+        if (!philosophy[retroSettings.philosophy]) {
+            throw new Error(`philosophy function ${retroSettings.philosophy} does not exist`)
+        }
+        if (!philosophy[retroSettings.philosophy].processData || typeof philosophy[retroSettings.philosophy].processData !== 'function') {
+            throw new Error(`philosophy function ${retroSettings.philosophy} must have a processData function`)
+        }
+
+    // Implement
 
         const sortedPriceHistory = _.sortBy(priceHistoryToAnalyze, 'createdAt', 'ASC');
         const firstRecord = sortedPriceHistory[0];
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
+
+        const runningPriceHistory = [];
+        const analyzedHistories = [];
+
+        const processSettings = {
+            symbol: retroSettings.symbol
+        };
+
+        // simulates the stream of data records. 
+        //  Thank goodness for sample data
+        for (let curPriceRecord of sortedPriceHistory) {
+            runningPriceHistory.push(curPriceRecord);
+            const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);
+            analyzedHistories.push(analyzedRecord);
+        }
         
         let finalLiquid = 0;
         let finalPositions = [];
         let symbolTotal = 0;
         let totalGrowth = 0;
         let totalGrowthPercent = 0;
+
 
         return {
             symbol: retroSettings.symbol,
