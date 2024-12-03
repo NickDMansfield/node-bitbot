@@ -15,7 +15,7 @@ const _ = require('lodash');
 const funcs = require('../funcs/funcs');
 
 module.exports = {
-    processData (processSettings, priceHistory, purchaseHistory) {
+        processData (processSettings, priceHistory, purchaseHistory) {
     //  This is meant to be called against one record (which is the last in the index), and should be run on every single period
     //      Sort of a minute-by-minute process which handles streaming periods of data
         // priceHistory should be inclusive of the current price being tested
