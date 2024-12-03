@@ -86,6 +86,11 @@ module.exports = {
         //  Thank goodness for sample data
         for (let curPriceRecord of sortedPriceHistory) {
             runningPriceHistory.push(curPriceRecord);
+
+            //  Determine if a periodic buy should occur here
+            // TODO: actually do that
+
+
             const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);
             analyzedHistories.push(analyzedRecord);
 
@@ -120,7 +125,8 @@ module.exports = {
             symbolTotal,
             symbolTotalInUSD: finalSymbolEquity,
             totalGrowth,
-            totalGrowthPercent
+            totalGrowthPercent,
+            analyzedHistories
         }
     }
 }
