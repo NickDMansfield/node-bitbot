@@ -41,7 +41,30 @@ module.exports = {
     },
 
     calculateShortValue (priceHistory, processSettings) {
+        // This assumes that the user has already made the decision to short. It is only meant to calculate the short value
 
+        if (!priceHistory) {
+            throw new Error('No priceHistory arg provided');
+        }
+        if (!processSettings) {
+            throw new Error('No processSettings arg provided');
+        }
+        if (!processSettings.averagePrice && processSettings.averagePrice !== 0) {
+            throw new Error('No processSettings.averagePrice provided');
+        }
+        if (!processSettings.currentPrice && processSettings.currentPrice !== 0) {
+            throw new Error('No processSettings.currentPrice provided');
+        }
+        if (Number.isNaN(parseInt(processSettings.currentPrice))) {
+            throw new Error('processSettings.currentPrice must be a number');
+        }
+        if (Number.isNaN(parseInt(processSettings.averagePrice))) {
+            throw new Error('processSettings.averagePrice must be a number');
+        }
+
+        if (processSettings.currentPrice < processSettings.averagePrice && !processSettings.enableSuicideShorts) {
+            throw new Error('An attempt to calculate a suicide short was made. Set enableSuicideShorts to true in the processSettings to bypass this');
+        }
         
         const weeklyLow = _.chain(priceHistory)
         .filter(obj => moment(obj.createdAt).isAfter(moment().subtract(7, 'days')))
@@ -67,5 +90,42 @@ module.exports = {
             }
         } 
         return shortBuyPrice;
+    },
+
+    filterRunnableLimitOrders (limitOrders, currentPrice) {
+        if (!limitOrders || !Array.isArray(limitOrders)) {
+            throw new Error('You must provide a limitOrders array');
+        }
+
+        if (!currentPrice && Number.isNaN(currentPrice)) {
+            throw new Error('No currentPrice provided');
+        }
+        return limitOrders.filter(lo => this.isLimitOrderRunnable(lo, currentPrice));
+    },
+    isLimitOrderRunnable(limitOrder, currentPrice) {
+        if (!limitOrder || typeof limitOrder !== 'object') {
+            throw new Error('You must provide a limitOrder object');
+        }
+
+        if (!limitOrder.amountToBuy && !limitOrder.amountToSell) {
+            throw new Error('You must provide either an amountToSell or an amountToBuy');
+        }
+
+        if (!limitOrder.price) {
+            throw new Error('You must provide a price property on the limitOrder');
+        }
+
+        if (Number.isNaN(parseInt(limitOrder.price))) {
+            throw new Error('limitOrder.price must be a number');
+        }
+
+        if (!currentPrice || Number.isNaN(parseInt(currentPrice))) {
+            throw new Error('No currentPrice number provided');
+        }
+
+            // buy order, so we want a lower price than the listed limit
+        return limitOrder.amountToBuy ? currentPrice <= limitOrder.price : 
+            // sell, so we will happily take a higher value
+            currentPrice >= limitOrder.price;
     }
 }

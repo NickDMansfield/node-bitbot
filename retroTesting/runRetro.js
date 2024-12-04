@@ -97,6 +97,7 @@ module.exports = {
             // Handle the new results
             if (analyzedRecord.shouldSell) {
                 // This is where we would make an API call if it were a real system
+                // TODO: Incorporate the limit transactions into this math
                 finalLiquid += analyzedRecord.estimatedRevenue;
                 symbolTotal -= analyzedRecord.amountToSell;
             }

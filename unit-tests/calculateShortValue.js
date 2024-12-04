@@ -24,6 +24,16 @@ describe('calculateShortValue', function () {
         funcs.calculateShortValue([], { averagePrice: 13.37 });
       }, Error('No processSettings.currentPrice provided'));
     });
+    it('should throw an error if there is a non-numeric processSettings.currentPrice', function () {
+      assert.throws(() => {
+        funcs.calculateShortValue([], { averagePrice: 13.37, currentPrice: 'hello' });
+      }, Error('processSettings.currentPrice must be a number'));
+    });
+    it('should throw an error if there is a non-numeric processSettings.averagePrice', function () {
+      assert.throws(() => {
+        funcs.calculateShortValue([], { averagePrice: 'I am not a number!' ,currentPrice: 13.37 });
+      }, Error('processSettings.averagePrice must be a number'));
+    });
     it('should throw an error if the currentPrice is less than the average price and enableSuicideShorts is not enabled', function () {
       assert.throws(() => {
         funcs.calculateShortValue([], { averagePrice: 13.37, currentPrice: 5.15 });
@@ -39,17 +49,25 @@ describe('calculateShortValue', function () {
       };
       const shortPrice = funcs.calculateShortValue(priceHistory, processSettings);
     });
-    it('should return the correct values when overrideWeeklyLow is on', function () {
+
+    it('should return the correct values when the weeklyLow is < shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is false', function () {
+      assert.equal([1, 2, 3].indexOf(4), 99);
+    });
+    it('should return the correct values when the weeklyLow is > shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is false', function () {
+      assert.equal([1, 2, 3].indexOf(4), 99);
+    });
+    it('should return the correct values when the weeklyLow is equal to shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is false', function () {
       assert.equal([1, 2, 3].indexOf(4), 99);
     });
 
-    it('should return the correct values when the weeklyLow is < shortReductionPercentAdjustedBuyPrice', function () {
+
+    it('should return the correct values when the weeklyLow is < shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is true', function () {
       assert.equal([1, 2, 3].indexOf(4), 99);
     });
-    it('should return the correct values when the weeklyLow is > shortReductionPercentAdjustedBuyPrice', function () {
+    it('should return the correct values when the weeklyLow is > shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is true', function () {
       assert.equal([1, 2, 3].indexOf(4), 99);
     });
-    it('should return the correct values when the weeklyLow is equal to shortReductionPercentAdjustedBuyPrice', function () {
+    it('should return the correct values when the weeklyLow is equal to shortReductionPercentAdjustedBuyPrice and overrideWeeklyLow is true', function () {
       assert.equal([1, 2, 3].indexOf(4), 99);
     });
   });

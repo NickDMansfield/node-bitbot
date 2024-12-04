@@ -56,7 +56,7 @@ module.exports = {
                     //  Determine if a short is necessary
                     //      In this case we always short
                     const shortBuyPrice = funcs.calculateShortValue(priceHistory, { ...processSettings, currentPrice, averagePrice });
-                    limitOrdersToSet.push( {
+                    limitOrdersToSet.push({
                         symbol: processSettings.symbol,
                         // This is not a typo. We are moving the entire position
                         amountToBuy: amountToSell,
