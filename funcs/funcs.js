@@ -49,6 +49,9 @@ module.exports = {
         if (!processSettings) {
             throw new Error('No processSettings arg provided');
         }
+        if (!processSettings.timeToEvaluate) {
+            throw new Error('No processSettings.timeToEvaluate provided');
+        }
         if (!processSettings.averagePrice && processSettings.averagePrice !== 0) {
             throw new Error('No processSettings.averagePrice provided');
         }
@@ -66,11 +69,14 @@ module.exports = {
             throw new Error('An attempt to calculate a suicide short was made. Set enableSuicideShorts to true in the processSettings to bypass this');
         }
         
-        const weeklyLow = _.chain(priceHistory)
-        .filter(obj => moment(obj.createdAt).isAfter(moment().subtract(7, 'days')))
-        .minBy('price')
-        .get('price', null)
-        .value();
+        let weeklyLow = _.filter(priceHistory, obj => moment(obj.createdAt).isAfter(moment(processSettings.timeToEvaluate).subtract(7, 'days')));
+        weeklyLow = _.sortBy(weeklyLow, 'price', 'ASC')[0].price;
+        
+        // _.chain(priceHistory)
+        // .filter(obj => moment(obj.createdAt).isAfter(moment().subtract(7, 'days')));
+        // .minBy('price')
+        // .get('price', null)
+        // .value();
         
         // Determine short price
 
@@ -85,7 +91,7 @@ module.exports = {
             // This is a multiplier, so a 5% ease up on the short would be 1.05 and a 3% reduction would be 0.97
             shortReductionPercentAdjustedBuyPrice = shortBaseValue * processSettings.shortAdjustmentModifier;
             //  We allow an override in case you want to use a more aggressive upswing on crabbing
-            if (processSettings.overrideWeeklyLow || weeklyLow < shortReductionPercentAdjustedBuyPrice) {
+            if (processSettings.overrideWeeklyLow || weeklyLow > shortReductionPercentAdjustedBuyPrice) {
                 shortBuyPrice = shortReductionPercentAdjustedBuyPrice;
             }
         } 
