@@ -4,6 +4,29 @@ const big = require('big-js');
 
 
 describe('calculateAccelerationForRange', function () {
+  
+  describe('Failure states', function () {
+
+    it('should throw an error when no historyRecords are provided', function () {
+      assert.throws(() => {
+        funcs.calculateAccelerationForRange();
+      }, Error('You must submit an array with at least two historical price records'));
+    });
+
+    it('should throw an error when only one historyRecords is provided', function () {
+      assert.throws(() => {
+        funcs.calculateAccelerationForRange([{ symbol: 'LTC', price: 55.22, createdAt: '2023-10-05T18:02:15.556595' }]);
+      }, Error('You must submit an array with at least two historical price records'));
+    });
+
+    it('should throw an error when no historyRecords are provided', function () {
+      assert.throws(() => {
+        funcs.calculateAccelerationForRange([]);
+      }, Error('You must submit an array with at least two historical price records'));
+    });
+
+  });
+
   describe('Hourly tests', function () {
     it('should return proper calculations on profit', function () {
       const mockHistory = [

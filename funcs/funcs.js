@@ -23,6 +23,25 @@ module.exports = {
     },
 
     calculateAcceleration (initialRecord, recentRecord) {
+        if (!initialRecord) {
+            throw new Error('You must provide an initialRecord arg object');
+        }
+        if (!initialRecord.price || Number.isNaN(parseFloat(initialRecord.price))) {
+            throw new Error('initialRecord must have a numeric price value');
+        }
+        if (!initialRecord.createdAt || !this.isDate(initialRecord.createdAt)) {
+            throw new Error('initialRecord must have a createdAt datetime property');
+        }
+
+        if (!recentRecord) {
+            throw new Error('You must provide an recentRecord arg object');
+        }
+        if (!recentRecord.price || Number.isNaN(parseFloat(recentRecord.price))) {
+            throw new Error('recentRecord must have a numeric price value');
+        }
+        if (!recentRecord.createdAt || !this.isDate(recentRecord.createdAt)) {
+            throw new Error('recentRecord must have a createdAt datetime property');
+        }
 
         // Calculate the totalTime
         const totalTime = moment(recentRecord.createdAt).diff(moment(initialRecord.createdAt), 'hours');
@@ -58,10 +77,10 @@ module.exports = {
         if (!processSettings.currentPrice && processSettings.currentPrice !== 0) {
             throw new Error('No processSettings.currentPrice provided');
         }
-        if (Number.isNaN(parseInt(processSettings.currentPrice))) {
+        if (Number.isNaN(parseFloat(processSettings.currentPrice))) {
             throw new Error('processSettings.currentPrice must be a number');
         }
-        if (Number.isNaN(parseInt(processSettings.averagePrice))) {
+        if (Number.isNaN(parseFloat(processSettings.averagePrice))) {
             throw new Error('processSettings.averagePrice must be a number');
         }
 
@@ -121,11 +140,11 @@ module.exports = {
             throw new Error('You must provide a price property on the limitOrder');
         }
 
-        if (Number.isNaN(parseInt(limitOrder.price))) {
+        if (Number.isNaN(parseFloat(limitOrder.price))) {
             throw new Error('limitOrder.price must be a number');
         }
 
-        if (!currentPrice || Number.isNaN(parseInt(currentPrice))) {
+        if (!currentPrice || Number.isNaN(parseFloat(currentPrice))) {
             throw new Error('No currentPrice number provided');
         }
 
@@ -133,5 +152,11 @@ module.exports = {
         return limitOrder.amountToBuy ? currentPrice <= limitOrder.price : 
             // sell, so we will happily take a higher value
             currentPrice >= limitOrder.price;
+    },
+
+    isDate(dateStr) {
+        // TODO: Add tests
+        var date = new Date(dateStr);
+        return date instanceof Date && !isNaN(date.valueOf());
     }
 }
