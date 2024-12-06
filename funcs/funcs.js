@@ -156,7 +156,37 @@ module.exports = {
 
     isDate(dateStr) {
         // TODO: Add tests
+        if (!dateStr) {
+            return false;
+        }
         var date = new Date(dateStr);
         return date instanceof Date && !isNaN(date.valueOf());
+    },
+
+    shouldRunPeriodicTransaction(periodicTransaction, lastPeriodRunTime) {
+        if (!periodicTransaction || typeof periodicTransaction !== 'object') {
+            throw new Error('You must provide a periodicTransaction object');
+        }
+        if (typeof periodicTransaction.units !== 'string') {
+            throw new Error('the periodicTransaction object must have a string units property');
+        }
+        if (typeof periodicTransaction.period !== 'string') {
+            throw new Error('the periodicTransaction object must have a string period property');
+        }
+        if (typeof periodicTransaction.orderType !== 'string') {
+            throw new Error('the periodicTransaction object must have a string orderType property');
+        }
+        if (!periodicTransaction.quantity || Number.isNaN(Number.parseFloat(periodicTransaction.quantity))) {
+            throw new Error('the periodicTransaction object must have a numeric quantity property');
+        }
+        if (lastPeriodRunTime && !this.isDate(lastPeriodRunTime)) {
+            throw new Error('You must provide a lastPeriodRunTime date');
+        }
+        if (!lastPeriodRunTime) {
+            return true;
+        }
+        throw new Error('FINISH THE LOGIC FOR THIS FUNCTION!!');
+
+        return true;
     }
 }
