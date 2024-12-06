@@ -46,6 +46,10 @@ module.exports = {
         let shouldSell = false;
         let limitOrdersToSet = []
 
+        if (!processSettings.timeToEvaluate) {
+            processSettings.timeToEvaluate = lastRecord.createdAt;
+        }
+
         if (currentPrice > averagePrice) {
             if (processSettings.minimumProfitPercentToSell) {
                 const currentProfitPercent = (currentPrice / averagePrice) - 1; // 0.1 = 10%
