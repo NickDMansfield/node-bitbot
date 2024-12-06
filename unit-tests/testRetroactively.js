@@ -112,12 +112,11 @@ describe('testRetroActively', function () {
         initialLiquid: 10000,
         initialPositions: [],
         initialPrice: 200,
-        finalLiquid: 10180,
-        // finalPositions: [],
+        finalLiquid: 10235.658973944597,
         finalPrice: 230,
         symbolTotal: 0,
         symbolTotalInUSD: 0,
-        totalGrowth: 30,
+        totalGrowth: 35.658973944597165,
         totalGrowthPercent: 1.003
       };
       const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);

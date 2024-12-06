@@ -84,7 +84,7 @@ module.exports = {
         let totalGrowth = 0;
         let totalGrowthPercent = 0;
 
-        let lastPeriodicTransaction = null;
+        let lastPeriodicTransactionRunTime = null;
 
         // simulates the stream of data records. 
         //  Thank goodness for sample data
@@ -96,7 +96,11 @@ module.exports = {
             if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
                 //  Determine if a periodic buy should occur here
                 for (let periodicTransaction of retroSettings.periodicTransactions) {
-                    if (funcs.shouldRunPeriodicTransaction(periodicTransaction)) {
+                    if (funcs.shouldRunPeriodicTransaction(periodicTransaction, lastPeriodicTransactionRunTime)) {
+
+                        // Update the last run time on a per-period basis
+                        lastPeriodicTransactionRunTime = curPriceRecord.createdAt;
+
                         let symbolQuantityModification = 0;
                         let liquidModification = 0;
                         if (periodicTransaction.orderType === dict.orderTypes.BUY) {
@@ -109,6 +113,9 @@ module.exports = {
                                 symbolQuantityModification = (periodicTransaction.quantity / curPriceRecord.price);
                                 liquidModification = -periodicTransaction.quantity;
                             }
+
+                            // We only need to append the purchaseHistory if it is a purchase
+                            purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price });
 
                         } else if (periodicTransaction.orderType === dict.orderTypes.SELL) {
                             if (periodicTransaction.units === dict.units.SYMBOL) {

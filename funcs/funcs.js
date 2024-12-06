@@ -1,5 +1,6 @@
 const moment = require('moment');
 const _ = require('lodash');
+const dict = require('../dict');
 
 module.exports = {
     analyzePurchaseLogs (){
@@ -185,7 +186,16 @@ module.exports = {
         if (!lastPeriodRunTime) {
             return true;
         }
-        throw new Error('FINISH THE LOGIC FOR THIS FUNCTION!!');
+
+        const isWithinLast24Hours = moment().diff(moment(lastPeriodRunTime), 'hours') < 24;
+        const isWithinLastWeek = moment().diff(moment(lastPeriodRunTime), 'days') < 7;
+
+        if (periodicTransaction.period === dict.periods.WEEKLY && isWithinLastWeek) {
+            return false;
+        }
+        if (periodicTransaction.period === dict.periods.DAILY && isWithinLast24Hours) {
+            return false;
+        }
 
         return true;
     }
