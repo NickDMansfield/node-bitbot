@@ -86,14 +86,6 @@ describe('calculateAcceleration', function () {
       assert.equal(results.totalGrowthPercent, expectedResults.totalGrowthPercent);
       assert.equal(results.growthRate, expectedResults.growthRate);
     });
-    
-    it('should return proper values and generate a single limitOrder (purchase)', function () {
-      assert.equal([1, 2, 3].indexOf(4), 99);
-    });
-
-    it('should return proper values and generate multiple limitOrders (purchase)', function () {
-      assert.equal([1, 2, 3].indexOf(4), 99);
-    });
   })
 
   describe('Hourly tests', function () {

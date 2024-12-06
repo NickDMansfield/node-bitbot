@@ -32,13 +32,13 @@ module.exports = {
         }
 
         const sortedPriceHistory = _.sortBy(priceHistory, 'createdAt', 'ASC');
-        const firstRecord = sortedPriceHistory[0];
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
         const currentPrice = lastRecord.price;
         const totalSymbolAmount = _.sumBy(purchaseHistory, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
-        const totalSymbolCost = _.sumBy(purchaseHistory, ph => Number.isNaN(ph.price) ? 0 : ph.price);
+        const totalSymbolCost = _.sumBy(purchaseHistory, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
         const currentTotalEquity = totalSymbolAmount * currentPrice;
-        const averagePrice = totalSymbolCost/purchaseHistory.length;
+        // If there are no items in the array, it will otherwise divide by 0 and throw an exception
+        const averagePrice = totalSymbolAmount ? totalSymbolCost/totalSymbolAmount : 0;
 
         let amountToSell = 0;
         let amountToBuy = 0;
@@ -60,7 +60,7 @@ module.exports = {
                         symbol: processSettings.symbol,
                         // This is not a typo. We are moving the entire position
                         amountToBuy: amountToSell,
-                        price: shortBuyPrice
+                        price: shortBuyPrice,
                     });
                 }
             }
