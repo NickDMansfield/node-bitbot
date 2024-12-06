@@ -15,6 +15,8 @@
 
 const _ = require('lodash');
 const philosophy = require('../philosophies/index');
+const dict = require('../dict');
+const funcs = require('../funcs/funcs');
 
 module.exports = {
     testRetroactively (purchaseHistoryForSymbol, priceHistoryToAnalyze, retroSettings) {
@@ -82,13 +84,49 @@ module.exports = {
         let totalGrowth = 0;
         let totalGrowthPercent = 0;
 
+        let lastPeriodicTransaction = null;
+
         // simulates the stream of data records. 
         //  Thank goodness for sample data
         for (let curPriceRecord of sortedPriceHistory) {
+            // Think of each iteration as a new hour or day
             runningPriceHistory.push(curPriceRecord);
 
-            //  Determine if a periodic buy should occur here
-            // TODO: actually do that
+            // Periodic buys
+            if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
+                //  Determine if a periodic buy should occur here
+                for (let periodicTransaction of retroSettings.periodicTransactions) {
+                    if (funcs.shouldRunPeriodicTransaction(periodicTransaction)) {
+                        let symbolQuantityModification = 0;
+                        let liquidModification = 0;
+                        if (periodicTransaction.orderType === dict.orderTypes.BUY) {
+                            if (periodicTransaction.units === dict.units.SYMBOL) {
+                                symbolQuantityModification = periodicTransaction.quantity;
+                                liquidModification = -(periodicTransaction.quantity * curPriceRecord.price);
+                            }
+
+                            if (periodicTransaction.units === dict.units.USD) {
+                                symbolQuantityModification = (periodicTransaction.quantity / curPriceRecord.price);
+                                liquidModification = -periodicTransaction.quantity;
+                            }
+
+                        } else if (periodicTransaction.orderType === dict.orderTypes.SELL) {
+                            if (periodicTransaction.units === dict.units.SYMBOL) {
+                                symbolQuantityModification = -periodicTransaction.quantity;
+                                liquidModification = periodicTransaction.quantity * curPriceRecord.price;
+                            }
+
+                            if (periodicTransaction.units === dict.units.USD) {
+                                symbolQuantityModification = -(periodicTransaction.quantity / curPriceRecord.price);
+                                liquidModification = periodicTransaction.quantity;
+                            }
+                        }
+                        // We always use += since the negative is baked in above
+                        finalLiquid += liquidModification;
+                        symbolTotal += symbolQuantityModification;
+                    }            
+                }
+            }
 
 
             const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);

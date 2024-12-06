@@ -1,5 +1,6 @@
 const { testRetroactively } = require('../retroTesting/runRetro');
 var assert = require('assert');
+const dict = require('../dict');
 
 describe('testRetroActively', function () {
 
@@ -96,7 +97,10 @@ describe('testRetroActively', function () {
         philosophy: 'safeSwing',
         initialSymbolAmount: 1,
         minimumProfitPercentToSell: 0.1,
-        shortAdjustmentModifier: 0.99
+        shortAdjustmentModifier: 0.99,
+        periodicTransactions: [
+          { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 10, period: dict.periods.DAILY }
+        ]
       };
 
       const purchaseHistory = [
@@ -108,7 +112,7 @@ describe('testRetroActively', function () {
         initialLiquid: 10000,
         initialPositions: [],
         initialPrice: 200,
-        finalLiquid: 10230,
+        finalLiquid: 10180,
         // finalPositions: [],
         finalPrice: 230,
         symbolTotal: 0,
