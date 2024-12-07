@@ -29,6 +29,10 @@ describe('isLimitOrderRunnable', function () {
       const result = funcs.isLimitOrderRunnable({ amountToBuy: 11, price: 100 }, 110);
       assert.equal(false, result);
     });
+    it('should return false for a limit order which is already complete', function () {
+      const result = funcs.isLimitOrderRunnable({ amountToBuy: 11, price: 100, completedOn: new Date() }, 90);
+      assert.equal(false, result);
+    });
   });
 
   describe('Failure states', function () {

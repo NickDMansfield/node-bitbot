@@ -17,6 +17,7 @@ const _ = require('lodash');
 const philosophy = require('../philosophies/index');
 const dict = require('../dict');
 const funcs = require('../funcs/funcs');
+const { isLimitOrderRunnable } = require('../funcs/funcs');
 
 module.exports = {
     testRetroactively (purchaseHistoryForSymbol, priceHistoryToAnalyze, retroSettings) {
@@ -69,6 +70,7 @@ module.exports = {
 
         const runningPriceHistory = [];
         const analyzedHistories = [];
+        let limitOrders = [];
 
         const processSettings = {
             symbol: retroSettings.symbol,
@@ -104,12 +106,13 @@ module.exports = {
                         let symbolQuantityModification = 0;
                         let liquidModification = 0;
                         if (periodicTransaction.orderType === dict.orderTypes.BUY) {
-                            if (periodicTransaction.units === dict.units.SYMBOL) {
+                            if (periodicTransaction.units === dict.units.SYMBOL && finalLiquid >= (periodicTransaction.quantity * curPriceRecord.price)) {
                                 symbolQuantityModification = periodicTransaction.quantity;
                                 liquidModification = -(periodicTransaction.quantity * curPriceRecord.price);
                             }
 
-                            if (periodicTransaction.units === dict.units.USD) {
+                            // Make sure it won't purchase if there isn't enough money
+                            if (periodicTransaction.units === dict.units.USD && finalLiquid >= periodicTransaction.quantity) {
                                 symbolQuantityModification = (periodicTransaction.quantity / curPriceRecord.price);
                                 liquidModification = -periodicTransaction.quantity;
                             }
@@ -135,17 +138,51 @@ module.exports = {
                 }
             }
 
+            // Limit Orders
+            if (limitOrders && Array.isArray(limitOrders)) {
+                for (let limitOrder of limitOrders) {
+                    if (isLimitOrderRunnable(limitOrder, curPriceRecord.price)) {
+
+                        let symbolQuantityModification = 0;
+                        let liquidModification = 0;
+                        if (limitOrder.amountToBuy) {
+                            if (periodicTransaction.units === dict.units.SYMBOL && finalLiquid >= (limitOrder.amountToBuy * curPriceRecord.price)) {
+                                symbolQuantityModification = limitOrder.amountToBuy;
+                                liquidModification = -(limitOrder.amountToBuy * curPriceRecord.price);
+
+                                limitOrder.completedOn = (new Date()).toDateString();
+
+                                // We only need to append the purchaseHistory if it is a purchase
+                                purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
+                            }
+                        } else if (limitOrder.amountToSell) {
+                                symbolQuantityModification = -periodicTransaction.quantity;
+                                liquidModification = periodicTransaction.quantity * curPriceRecord.price;
+
+
+                                limitOrder.completedOn = (new Date()).toDateString();
+                                purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
+                        }
+                    }
+                }
+            }
+            
+
 
             const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);
             analyzedHistories.push(analyzedRecord);
 
+            // Set the new limit orders
+            limitOrders = [...limitOrders, ..._.flatMap(analyzedHistories, ah => ah.limitOrdersToSet)];
+
             // Handle the new results
             if (analyzedRecord.shouldSell) {
                 // This is where we would make an API call if it were a real system
-                // TODO: Incorporate the limit transactions into this math
                 finalLiquid += analyzedRecord.estimatedRevenue;
                 symbolTotal -= analyzedRecord.amountToSell;
             }
+
+            // TODO: Also handle buying situations
         }
 
         // package up and present the data

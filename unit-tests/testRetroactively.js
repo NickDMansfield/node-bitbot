@@ -37,7 +37,7 @@ describe('testRetroActively', function () {
         assert.throws(() => {
           testRetroactively([], [], {}); 
         }, Error('priceHistoryToAnalyze must be an array with at least one item'));
-    });
+      });
     });
     
     describe('retroSetting failure states', function () {
@@ -133,5 +133,11 @@ describe('testRetroActively', function () {
       // This is to round up, since we get a wacky long decimal which just rounds to the approximate 1.003 anywho
       assert.equal(Math.round(result.totalGrowthPercent * 1000)/1000, expectedOutput.totalGrowthPercent);
     });
+
+    it('should have the correct output properties for a test which generates and executes limitOrders', function () {
+      assert.equal(false, true);
+      // TODO: Make sure it flags them as completed via the completedOn property
+    });
+
   });
 });

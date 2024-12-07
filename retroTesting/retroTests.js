@@ -5,9 +5,9 @@ const dict = require('../dict');
 
 describe('Array', function () {
   describe('#indexOf()', function () {
-    it('should return -1 when the value is not present', function () {
+    it('should test against LTC', function () {
 
-        const historyStr = fs.readFileSync('../datasets/ltc_price_data_pct.json',
+        const historyStr = fs.readFileSync('datasets/ltc_price_data_pct2.json',
         { encoding: 'utf8', flag: 'r' });
         const mockHistory = JSON.parse(historyStr);
   
@@ -25,7 +25,13 @@ describe('Array', function () {
   
         const purchaseHistory = [];
   
-        const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
+        try{
+
+          const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
+          assert.ok(result);
+        } catch (err) {
+          assert.equal(1,2);
+        }
     });
   });
 });

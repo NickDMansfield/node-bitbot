@@ -149,6 +149,10 @@ module.exports = {
             throw new Error('No currentPrice number provided');
         }
 
+        if (limitOrder.completedOn) {
+            return false;
+        }
+
             // buy order, so we want a lower price than the listed limit
         return limitOrder.amountToBuy ? currentPrice <= limitOrder.price : 
             // sell, so we will happily take a higher value
