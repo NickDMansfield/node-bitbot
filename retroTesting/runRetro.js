@@ -146,7 +146,7 @@ module.exports = {
                         let symbolQuantityModification = 0;
                         let liquidModification = 0;
                         if (limitOrder.amountToBuy) {
-                            if (periodicTransaction.units === dict.units.SYMBOL && finalLiquid >= (limitOrder.amountToBuy * curPriceRecord.price)) {
+                            if (finalLiquid >= (limitOrder.amountToBuy * curPriceRecord.price)) {
                                 symbolQuantityModification = limitOrder.amountToBuy;
                                 liquidModification = -(limitOrder.amountToBuy * curPriceRecord.price);
 
@@ -156,6 +156,8 @@ module.exports = {
                                 purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
                             }
                         } else if (limitOrder.amountToSell) {
+                                // TODO: Check that the quantity is available, and clear it if not
+                                //     Or possibly account for the limits when setting sales
                                 symbolQuantityModification = -periodicTransaction.quantity;
                                 liquidModification = periodicTransaction.quantity * curPriceRecord.price;
 
@@ -176,7 +178,7 @@ module.exports = {
             limitOrders = [...limitOrders, ..._.flatMap(analyzedHistories, ah => ah.limitOrdersToSet)];
 
             // Handle the new results
-            if (analyzedRecord.shouldSell) {
+            if (analyzedRecord.shouldSell && symbolTotal >= analyzedRecord.amountToSell) {
                 // This is where we would make an API call if it were a real system
                 finalLiquid += analyzedRecord.estimatedRevenue;
                 symbolTotal -= analyzedRecord.amountToSell;
