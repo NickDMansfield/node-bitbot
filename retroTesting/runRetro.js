@@ -93,6 +93,7 @@ module.exports = {
         for (let curPriceRecord of sortedPriceHistory) {
             // Think of each iteration as a new hour or day
             runningPriceHistory.push(curPriceRecord);
+            console.log(`Running ${curPriceRecord.createdAt}`);
 
             // Periodic buys
             if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
