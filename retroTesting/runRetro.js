@@ -93,7 +93,10 @@ module.exports = {
         for (let curPriceRecord of sortedPriceHistory) {
             // Think of each iteration as a new hour or day
             runningPriceHistory.push(curPriceRecord);
-            console.log(`Running ${curPriceRecord.createdAt}`);
+            if (!curPriceRecord) {
+                continue;
+            }
+           console.log(`Running ${curPriceRecord.createdAt}`);
 
             // Periodic buys
             if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
@@ -159,12 +162,14 @@ module.exports = {
                         } else if (limitOrder.amountToSell) {
                                 // TODO: Check that the quantity is available, and clear it if not
                                 //     Or possibly account for the limits when setting sales
+                            if (symbolTotal >= (limitOrder.amountToSell)) {
                                 symbolQuantityModification = -periodicTransaction.quantity;
                                 liquidModification = periodicTransaction.quantity * curPriceRecord.price;
 
 
                                 limitOrder.completedOn = (new Date()).toDateString();
                                 purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
+                            }
                         }
                     }
                 }
@@ -176,6 +181,7 @@ module.exports = {
             analyzedHistories.push(analyzedRecord);
 
             // Set the new limit orders
+            // TODO: Verify if we should perhaps instead use the one analyzedRecord. Might improve performance
             limitOrders = [...limitOrders, ..._.flatMap(analyzedHistories, ah => ah.limitOrdersToSet)];
 
             // Handle the new results
@@ -183,9 +189,15 @@ module.exports = {
                 // This is where we would make an API call if it were a real system
                 finalLiquid += analyzedRecord.estimatedRevenue;
                 symbolTotal -= analyzedRecord.amountToSell;
+            } 
+            else // teehee this formatting is whimsically kitschy
+            // TODO: Write tests for buying situations
+            if (analyzedRecord.shouldBuy && finalLiquid >= analyzedRecord.estimatedCost) {
+                // This is where we would make an API call if it were a real system
+                finalLiquid -= analyzedRecord.estimatedRevenue;
+                symbolTotal += analyzedRecord.amountToSell;
             }
 
-            // TODO: Also handle buying situations
         }
 
         // package up and present the data

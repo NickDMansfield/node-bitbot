@@ -50403,5 +50403,15 @@
     "symbol": "DOGE",
     "price": 0.01,
     "createdAt": "2024-11-28T18:02:15.556595"
+  },
+  {
+    "symbol": "DOGE",
+    "price": 0.02,
+    "createdAt": "2024-11-28T19:02:15.556595"
+  },
+  {
+    "symbol": "DOGE",
+    "price": 0.03,
+    "createdAt": "2024-11-28T20:02:15.556595"
   }
 ]
