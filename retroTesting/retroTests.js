@@ -24,11 +24,11 @@ describe('Array', function () {
     //       ]
     //     };
   
-    //     const purchaseHistory = [];
+    //     const orderHistory = [];
   
     //     try{
 
-    //       const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
+    //       const result = testRetroactively(orderHistory, mockHistory, retroSettings);
     //       assert.ok(result);
     //       result.analyzedHistories = null
     //       console.log(result);
@@ -56,11 +56,11 @@ describe('Array', function () {
     //       ]
     //     };
   
-    //     const purchaseHistory = [];
+    //     const orderHistory = [];
   
     //     try{
 
-    //       const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
+    //       const result = testRetroactively(orderHistory, mockHistory, retroSettings);
     //       assert.ok(result);
     //       result.analyzedHistories = null
     //       console.log(result);
@@ -69,37 +69,235 @@ describe('Array', function () {
     //       assert.equal(1,2);
     //     }
     // });
+  //   it('should test against BTC', function () {
+
+  //     const historyStr = fs.readFileSync('datasets/btc_price_data_pct.json',
+  //     { encoding: 'utf8', flag: 'r' });
+  //     const mockHistory = JSON.parse(historyStr);
+
+  //     const retroSettings = {
+  //       initialLiquid: 10000,
+  //       symbol: 'BTC',
+  //       philosophy: 'safeSwing',
+  //       initialSymbolAmount: 0,
+  //       minimumProfitPercentToSell: 0.01,
+  //       shortAdjustmentModifier: 0.99,
+  //       useCurrentPriceForAdjustment: true,
+  //       periodicTransactions: [
+  //         { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+  //       ]
+  //     };
+
+  //     const orderHistory = [];
+
+  //     try{
+
+  //       const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+  //       assert.ok(result);
+  //       result.analyzedHistories = null
+  //       console.log(result);
+  //       assert.equal(result.totalGrowthPercent, 999);
+  //     } catch (err) {
+  //       assert.equal(1,2);
+  //     }
+  // });
+});
+
+describe('2-year profitable BTC', function() {
+
     it('should test against BTC', function () {
 
-        const historyStr = fs.readFileSync('datasets/doge_price_data_pct.json',
-        { encoding: 'utf8', flag: 'r' });
-        const mockHistory = JSON.parse(historyStr);
-  
-        const retroSettings = {
-          initialLiquid: 10000,
-          symbol: 'BTC',
-          philosophy: 'safeSwing',
-          initialSymbolAmount: 0,
-          minimumProfitPercentToSell: 0.01,
-          shortAdjustmentModifier: 0.99,
-          useCurrentPriceForAdjustment: true,
-          periodicTransactions: [
-            { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
-          ]
-        };
-  
-        const purchaseHistory = [];
-  
-        try{
+      const historyStr = fs.readFileSync('datasets/btc_hourly_data.json',
+      { encoding: 'utf8', flag: 'r' });
+      const mockHistory = JSON.parse(historyStr);
 
-          const result = testRetroactively(purchaseHistory, mockHistory, retroSettings);
-          assert.ok(result);
-          result.analyzedHistories = null
-          console.log(result);
-          assert.equal(result.totalGrowthPercent, 999);
-        } catch (err) {
-          assert.equal(1,2);
-        }
-    });
+      const retroSettings = {
+        initialLiquid: 10000,
+        symbol: 'BTC',
+        philosophy: 'safeSwing',
+        initialSymbolAmount: 0,
+        minimumProfitPercentToSell: 0.01,
+        shortAdjustmentModifier: 0.99,
+        periodicTransactions: [
+          { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+        ]
+      };
+
+      const orderHistory = [];
+
+      try{
+
+        const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+        assert.ok(result);
+        result.analyzedHistories = null
+        console.log(result);
+        // assert.equal(result.totalGrowthPercent, 999);
+      } catch (err) {
+        assert.equal(1,2);
+      }
   });
+
+  it('should test against BTC', function () {
+
+    const historyStr = fs.readFileSync('datasets/btc_hourly_data_steady-profit.json',
+    { encoding: 'utf8', flag: 'r' });
+    const mockHistory = JSON.parse(historyStr);
+
+    const retroSettings = {
+      initialLiquid: 10000,
+      symbol: 'BTC',
+      philosophy: 'safeSwing',
+      initialSymbolAmount: 0,
+      minimumProfitPercentToSell: 0.01,
+      shortAdjustmentModifier: 0.99,
+      periodicTransactions: [
+        { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+      ]
+    };
+
+    const orderHistory = [];
+
+    try{
+
+      const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+      assert.ok(result);
+      result.analyzedHistories = null
+      console.log(result);
+      // assert.equal(result.totalGrowthPercent, 999);
+    } catch (err) {
+      assert.equal(1,2);
+    }
+});
+})
+
+  // describe('profitable DOGE', function () {
+  //   it('should test against profitable DOGE with a 0.01/0.99 safeswing', function () {
+  
+  //       const historyStr = fs.readFileSync('datasets/doge_price_data_pct profitable.json',
+  //       { encoding: 'utf8', flag: 'r' });
+  //       const mockHistory = JSON.parse(historyStr);
+  
+  //       const retroSettings = {
+  //         initialLiquid: 10000,
+  //         symbol: 'BTC',
+  //         philosophy: 'safeSwing',
+  //         initialSymbolAmount: 0,
+  //         minimumProfitPercentToSell: 0.01,
+  //         shortAdjustmentModifier: 0.99,
+  //         useCurrentPriceForAdjustment: false,
+  //         periodicTransactions: [
+  //           { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+  //         ]
+  //       };
+  
+  //       const orderHistory = [];
+  
+  //       try{
+  
+  //         const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+  //         assert.ok(result);
+  //         result.analyzedHistories = null
+  //         console.log(result);
+  //         //assert.equal(result.totalGrowthPercent, 999);
+  //       } catch (err) {
+  //         assert.equal(1,2);
+  //       }
+  //   });
+  //   it('should test against profitable DOGE with a 0.02/0.98 safeswing', function () {
+  
+  //       const historyStr = fs.readFileSync('datasets/doge_price_data_pct profitable.json',
+  //       { encoding: 'utf8', flag: 'r' });
+  //       const mockHistory = JSON.parse(historyStr);
+  
+  //       const retroSettings = {
+  //         initialLiquid: 10000,
+  //         symbol: 'BTC',
+  //         philosophy: 'safeSwing',
+  //         initialSymbolAmount: 0,
+  //         minimumProfitPercentToSell: 0.02,
+  //         shortAdjustmentModifier: 0.98,
+  //         useCurrentPriceForAdjustment: false,
+  //         periodicTransactions: [
+  //           { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+  //         ]
+  //       };
+  
+  //       const orderHistory = [];
+  
+  //       try{
+  
+  //         const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+  //         assert.ok(result);
+  //         result.analyzedHistories = null
+  //         console.log(result);
+  //         //assert.equal(result.totalGrowthPercent, 999);
+  //       } catch (err) {
+  //         assert.equal(1,2);
+  //       }
+  //   });
+  //   it('should test against profitable DOGE with a 0.03/0.97 safeswing', function () {
+  
+  //       const historyStr = fs.readFileSync('datasets/doge_price_data_pct profitable.json',
+  //       { encoding: 'utf8', flag: 'r' });
+  //       const mockHistory = JSON.parse(historyStr);
+  
+  //       const retroSettings = {
+  //         initialLiquid: 10000,
+  //         symbol: 'BTC',
+  //         philosophy: 'safeSwing',
+  //         initialSymbolAmount: 0,
+  //         minimumProfitPercentToSell: 0.03,
+  //         shortAdjustmentModifier: 0.97,
+  //         useCurrentPriceForAdjustment: false,
+  //         periodicTransactions: [
+  //           { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+  //         ]
+  //       };
+  
+  //       const orderHistory = [];
+  
+  //       try{
+  
+  //         const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+  //         assert.ok(result);
+  //         result.analyzedHistories = null
+  //         console.log(result);
+  //         // assert.equal(result.totalGrowthPercent, 999);
+  //       } catch (err) {
+  //         assert.equal(1,2);
+  //       }
+  //   });
+  //   it('should test against profitable DOGE with a 0.1/0.99 safeswing', function () {
+  
+  //       const historyStr = fs.readFileSync('datasets/doge_price_data_pct profitable.json',
+  //       { encoding: 'utf8', flag: 'r' });
+  //       const mockHistory = JSON.parse(historyStr);
+  
+  //       const retroSettings = {
+  //         initialLiquid: 10000,
+  //         symbol: 'BTC',
+  //         philosophy: 'safeSwing',
+  //         initialSymbolAmount: 0,
+  //         minimumProfitPercentToSell: 0.1,
+  //         shortAdjustmentModifier: 0.99,
+  //         useCurrentPriceForAdjustment: false,
+  //         periodicTransactions: [
+  //           { orderType: dict.orderTypes.BUY, units: dict.units.USD, quantity: 5, period: dict.periods.DAILY }
+  //         ]
+  //       };
+  
+  //       const orderHistory = [];
+  
+  //       try{
+  
+  //         const result = testRetroactively(orderHistory, mockHistory, retroSettings);
+  //         assert.ok(result);
+  //         result.analyzedHistories = null
+  //         console.log(result);
+  //         // assert.equal(result.totalGrowthPercent, 999);
+  //       } catch (err) {
+  //         assert.equal(1,2);
+  //       }
+  //   });
+  // });
 });

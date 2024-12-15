@@ -11,10 +11,10 @@ describe('SafeSwing', function () {
       }, Error('You must provide a processSettings arg object'));
     });
     
-    it('should throw an error when no purchaseHistory is provided', function () {
+    it('should throw an error when no orderHistory is provided', function () {
       assert.throws(() => {
         safeSwing.processData({}, []); 
-      }, Error('You must provide a purchaseHistory array arg'));
+      }, Error('You must provide a orderHistory array arg'));
     });
     
     it('should throw an error when no priceHistory is provided', function () {
@@ -29,10 +29,10 @@ describe('SafeSwing', function () {
       }, Error('You must provide a priceHistory array arg'));
     });
     
-    it('should throw an error when a non-array purchaseHistory is provided', function () {
+    it('should throw an error when a non-array orderHistory is provided', function () {
       assert.throws(() => {
         safeSwing.processData({}, [{}], 727); 
-      }, Error('You must provide a purchaseHistory array arg'));
+      }, Error('You must provide a orderHistory array arg'));
     });
 
   });
@@ -64,13 +64,13 @@ describe('SafeSwing', function () {
         { symbol: 'LTC', price: 51.50, createdAt: '2023-10-05T18:02:15.556595' },
         { symbol: 'LTC', price: 55, createdAt: '2023-10-05T22:02:15.556595' }];
 
-      const purchaseHistory = [
+      const orderHistory = [
         { price: 75, quantity: 0.7 },
         { price: 75, quantity: 0.3 },
         { price: 25, quantity: 1 }
       ];
 
-      const results = safeSwing.processData(processSettings, priceHistory, purchaseHistory);
+      const results = safeSwing.processData(processSettings, priceHistory, orderHistory);
       
       assert.equal(results.symbol, expectedResults.symbol);
       assert.equal(results.shouldBuy, expectedResults.shouldBuy);
@@ -113,13 +113,13 @@ describe('SafeSwing', function () {
         { symbol: 'LTC', price: 54, createdAt: '2023-10-05T18:02:15.556595' },
         { symbol: 'LTC', price: 55, createdAt: '2023-10-05T22:02:15.556595' }];
 
-      const purchaseHistory = [
+      const orderHistory = [
         { price: 75, quantity: 0.7 },
         { price: 75, quantity: 0.3 },
         { price: 25, quantity: 1 }
       ];
 
-      const results = safeSwing.processData(processSettings, priceHistory, purchaseHistory);
+      const results = safeSwing.processData(processSettings, priceHistory, orderHistory);
       
       assert.equal(results.symbol, expectedResults.symbol);
       assert.equal(results.shouldBuy, expectedResults.shouldBuy);

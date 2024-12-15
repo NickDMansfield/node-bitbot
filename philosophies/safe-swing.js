@@ -15,13 +15,13 @@ const _ = require('lodash');
 const funcs = require('../funcs/funcs');
 
 module.exports = {
-        processData (processSettings, priceHistory, purchaseHistory) {
+        processData (processSettings, priceHistory, orderHistory) {
     //  This is meant to be called against one record (which is the last in the index), and should be run on every single period
     //      Sort of a minute-by-minute process which handles streaming periods of data
         // priceHistory should be inclusive of the current price being tested
 
-        if (!purchaseHistory || !Array.isArray(purchaseHistory)) {
-            throw new Error('You must provide a purchaseHistory array arg');
+        if (!orderHistory || !Array.isArray(orderHistory)) {
+            throw new Error('You must provide a orderHistory array arg');
         }
         if (!priceHistory || !Array.isArray(priceHistory)) {
             throw new Error('You must provide a priceHistory array arg');
@@ -34,8 +34,8 @@ module.exports = {
         const sortedPriceHistory = _.sortBy(priceHistory, 'createdAt', 'ASC');
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
         const currentPrice = lastRecord.price;
-        const totalSymbolAmount = _.sumBy(purchaseHistory, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
-        const totalSymbolCost = _.sumBy(purchaseHistory, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
+        const totalSymbolAmount = _.sumBy(orderHistory, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
+        const totalSymbolCost = _.sumBy(orderHistory, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
         const currentTotalEquity = totalSymbolAmount * currentPrice;
         // If there are no items in the array, it will otherwise divide by 0 and throw an exception
         const averagePrice = totalSymbolAmount ? totalSymbolCost/totalSymbolAmount : 0;
@@ -49,7 +49,7 @@ module.exports = {
         if (!processSettings.timeToEvaluate) {
             processSettings.timeToEvaluate = lastRecord.createdAt;
         }
-
+        console.log(averagePrice);
         if (currentPrice > averagePrice) {
             if (processSettings.minimumProfitPercentToSell) {
                 const currentProfitPercent = (currentPrice / averagePrice) - 1; // 0.1 = 10%

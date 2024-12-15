@@ -20,11 +20,11 @@ const funcs = require('../funcs/funcs');
 const { isLimitOrderRunnable } = require('../funcs/funcs');
 
 module.exports = {
-    testRetroactively (purchaseHistoryForSymbol, priceHistoryToAnalyze, retroSettings) {
+    testRetroactively (orderHistoryForSymbol, priceHistoryToAnalyze, retroSettings) {
         
     // Validate
-        if (!purchaseHistoryForSymbol) {
-            throw new Error('No purchaseHistoryForSymbol supplied');
+        if (!orderHistoryForSymbol) {
+            throw new Error('No orderHistoryForSymbol supplied');
         }
         if (!priceHistoryToAnalyze) {
             throw new Error('No priceHistoryToAnalyze supplied');
@@ -36,8 +36,8 @@ module.exports = {
         if (typeof retroSettings !== 'object' || Array.isArray(retroSettings)) {
             throw new Error('retroSettings must be an object');
         }
-        if (!Array.isArray(purchaseHistoryForSymbol)) {
-            throw new Error('purchaseHistoryForSymbol must be an array')
+        if (!Array.isArray(orderHistoryForSymbol)) {
+            throw new Error('orderHistoryForSymbol must be an array')
         }
         if (!Array.isArray(priceHistoryToAnalyze)) {
             throw new Error('priceHistoryToAnalyze must be an array')
@@ -96,7 +96,7 @@ module.exports = {
             if (!curPriceRecord) {
                 continue;
             }
-           console.log(`Running ${curPriceRecord.createdAt}`);
+        //   console.log(`Running ${curPriceRecord.createdAt}`);
 
             // Periodic buys
             if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
@@ -121,8 +121,7 @@ module.exports = {
                                 liquidModification = -periodicTransaction.quantity;
                             }
 
-                            // We only need to append the purchaseHistory if it is a purchase
-                            purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price });
+                            orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, orderType: dict.orderTypes.BUY });
 
                         } else if (periodicTransaction.orderType === dict.orderTypes.SELL) {
                             if (periodicTransaction.units === dict.units.SYMBOL) {
@@ -134,6 +133,7 @@ module.exports = {
                                 symbolQuantityModification = -(periodicTransaction.quantity / curPriceRecord.price);
                                 liquidModification = periodicTransaction.quantity;
                             }
+                            orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, orderType: dict.orderTypes.SELL });
                         }
                         // We always use += since the negative is baked in above
                         finalLiquid += liquidModification;
@@ -156,8 +156,8 @@ module.exports = {
 
                                 limitOrder.completedOn = (new Date()).toDateString();
 
-                                // We only need to append the purchaseHistory if it is a purchase
-                                purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
+                                // We only need to append the orderHistory if it is a purchase
+                                orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder, orderType: dict.orderTypes.BUY });
                             }
                         } else if (limitOrder.amountToSell) {
                                 // TODO: Check that the quantity is available, and clear it if not
@@ -168,7 +168,7 @@ module.exports = {
 
 
                                 limitOrder.completedOn = (new Date()).toDateString();
-                                purchaseHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder });
+                                orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder, orderType: dict.orderTypes.SELL });
                             }
                         }
                     }
@@ -177,12 +177,12 @@ module.exports = {
             
 
 
-            const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, purchaseHistoryForSymbol);
-            analyzedHistories.push(analyzedRecord);
+            const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, orderHistoryForSymbol);
+          //  analyzedHistories.push(analyzedRecord);
 
             // Set the new limit orders
             // TODO: Verify if we should perhaps instead use the one analyzedRecord. Might improve performance
-            limitOrders = [...limitOrders, ..._.flatMap(analyzedHistories, ah => ah.limitOrdersToSet)];
+            limitOrders = [...limitOrders, ...analyzedRecord.limitOrdersToSet];
 
             // Handle the new results
             if (analyzedRecord.shouldSell && symbolTotal >= analyzedRecord.amountToSell) {
@@ -194,8 +194,9 @@ module.exports = {
             // TODO: Write tests for buying situations
             if (analyzedRecord.shouldBuy && finalLiquid >= analyzedRecord.estimatedCost) {
                 // This is where we would make an API call if it were a real system
-                finalLiquid -= analyzedRecord.estimatedRevenue;
-                symbolTotal += analyzedRecord.amountToSell;
+                finalLiquid -= analyzedRecord.estimatedCost;
+                symbolTotal += analyzedRecord.amountToBuy;
+               // orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: analyzedRecord.amountToSell, price: curPriceRecord.price });
             }
 
         }
@@ -214,7 +215,7 @@ module.exports = {
         return {
             symbol: retroSettings.symbol,
             initialLiquid: retroSettings.initialLiquid,
-            // TODO: figure out if this is actually different conceptually from the purchaseHistory 
+            // TODO: figure out if this is actually different conceptually from the orderHistory 
             // initialPositions: [],
             initialPrice,
             finalLiquid,
