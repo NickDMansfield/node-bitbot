@@ -3,9 +3,23 @@ const _ = require('lodash');
 const dict = require('../dict');
 
 module.exports = {
-    analyzePurchaseLogs (){
+    analyzeOrderHistory (orderHistory){
+        if (!orderHistory || !Array.isArray(orderHistory)) {
+            throw new Error('No order history array supplied');
+        }
+
+        const allBuys = _.filter(orderHistory, oh => oh.orderType === dict.orderTypes.BUY);
+        const allSales = _.filter(orderHistory, oh => oh.orderType === dict.orderTypes.SELL);
+
+
+        const totalSymbolAmount = _.sumBy(allBuys, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity) - _.sumBy(allSales, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
+        const totalSymbolCost = _.sumBy(allBuys, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity) - _.sumBy(allSales, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
+        // If there are no items in the array, it will otherwise divide by 0 and throw an exception
+        const averagePrice = totalSymbolAmount ? totalSymbolCost/totalSymbolAmount : 0;
         return {
-            
+            totalSymbolAmount,
+            totalSymbolCost,
+            averagePrice
         }
     },
     calculateAccelerationForRange (historyRecords) {
@@ -202,5 +216,6 @@ module.exports = {
         }
 
         return true;
-    }
+    },
+
 }
