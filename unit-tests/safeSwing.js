@@ -1,5 +1,6 @@
 var assert = require('assert');
 const exp = require('constants');
+const dict = require('../dict');
 const safeSwing = require('../philosophies/safe-swing');
 
 describe('SafeSwing', function () {
@@ -65,9 +66,9 @@ describe('SafeSwing', function () {
         { symbol: 'LTC', price: 55, createdAt: '2023-10-05T22:02:15.556595' }];
 
       const orderHistory = [
-        { price: 75, quantity: 0.7 },
-        { price: 75, quantity: 0.3 },
-        { price: 25, quantity: 1 }
+        { price: 75, quantity: 0.7, orderType: dict.orderTypes.BUY },
+        { price: 75, quantity: 0.3, orderType: dict.orderTypes.BUY },
+        { price: 25, quantity: 1, orderType: dict.orderTypes.BUY }
       ];
 
       const results = safeSwing.processData(processSettings, priceHistory, orderHistory);
@@ -114,9 +115,9 @@ describe('SafeSwing', function () {
         { symbol: 'LTC', price: 55, createdAt: '2023-10-05T22:02:15.556595' }];
 
       const orderHistory = [
-        { price: 75, quantity: 0.7 },
-        { price: 75, quantity: 0.3 },
-        { price: 25, quantity: 1 }
+        { price: 75, quantity: 0.7, orderType: dict.orderTypes.BUY },
+        { price: 75, quantity: 0.3, orderType: dict.orderTypes.BUY },
+        { price: 25, quantity: 1, orderType: dict.orderTypes.BUY }
       ];
 
       const results = safeSwing.processData(processSettings, priceHistory, orderHistory);

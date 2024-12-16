@@ -34,11 +34,10 @@ module.exports = {
         const sortedPriceHistory = _.sortBy(priceHistory, 'createdAt', 'ASC');
         const lastRecord = sortedPriceHistory[sortedPriceHistory.length-1];
         const currentPrice = lastRecord.price;
-        const totalSymbolAmount = _.sumBy(orderHistory, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
-        const totalSymbolCost = _.sumBy(orderHistory, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
+
+        const { totalSymbolAmount, totalSymbolCost, averagePrice } = funcs.analyzeOrderHistory(orderHistory);
         const currentTotalEquity = totalSymbolAmount * currentPrice;
         // If there are no items in the array, it will otherwise divide by 0 and throw an exception
-        const averagePrice = totalSymbolAmount ? totalSymbolCost/totalSymbolAmount : 0;
 
         let amountToSell = 0;
         let amountToBuy = 0;

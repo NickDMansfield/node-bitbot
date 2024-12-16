@@ -104,7 +104,7 @@ describe('testRetroActively', function () {
       };
 
       const orderHistory = [
-        { price: 199, quantity: 1 }
+        { price: 199, quantity: 1, orderType: dict.orderTypes.BUY }
       ];
 
       const expectedOutput = {
@@ -160,7 +160,7 @@ describe('testRetroActively', function () {
       };
 
       const orderHistory = [
-        { price: 199, quantity: 1 }
+        { price: 199, quantity: 1, orderType: dict.orderTypes.BUY }
       ];
 
       const expectedOutput = {
