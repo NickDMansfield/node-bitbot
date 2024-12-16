@@ -179,7 +179,7 @@ module.exports = {
 
             const analyzedRecord = philosophy[retroSettings.philosophy].processData(processSettings, runningPriceHistory, orderHistoryForSymbol);
           //  analyzedHistories.push(analyzedRecord);
-
+            orderHistoryForSymbol = analyzedRecord.modifiedOrderHistory;
             // Set the new limit orders
             // TODO: Verify if we should perhaps instead use the one analyzedRecord. Might improve performance
             limitOrders = [...limitOrders, ...analyzedRecord.limitOrdersToSet];

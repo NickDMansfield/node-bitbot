@@ -79,6 +79,7 @@ module.exports = {
             estimatedCost: currentPrice * amountToBuy,
             estimatedRevenue: currentPrice * amountToSell,
             symbol: processSettings.symbol,
+            modifiedOrderHistory: orderHistory
         };
     }
 }

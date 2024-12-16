@@ -74,6 +74,7 @@ describe('SafeSwing', function () {
       const results = safeSwing.processData(processSettings, priceHistory, orderHistory);
       
       assert.equal(results.symbol, expectedResults.symbol);
+      assert.equal(results.modifiedOrderHistory, orderHistory);
       assert.equal(results.shouldBuy, expectedResults.shouldBuy);
       assert.equal(results.shouldSell, expectedResults.shouldSell);
       assert.equal(results.amountToBuy, expectedResults.amountToBuy);
@@ -123,6 +124,7 @@ describe('SafeSwing', function () {
       const results = safeSwing.processData(processSettings, priceHistory, orderHistory);
       
       assert.equal(results.symbol, expectedResults.symbol);
+      assert.equal(results.modifiedOrderHistory, orderHistory);
       assert.equal(results.shouldBuy, expectedResults.shouldBuy);
       assert.equal(results.shouldSell, expectedResults.shouldSell);
       assert.equal(results.amountToBuy, expectedResults.amountToBuy);
