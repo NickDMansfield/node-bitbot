@@ -96,13 +96,14 @@ module.exports = {
             if (!curPriceRecord) {
                 continue;
             }
-        //   console.log(`Running ${curPriceRecord.createdAt}`);
+          console.log(`Running ${curPriceRecord.createdAt}`);
 
             // Periodic buys
             if (retroSettings.periodicTransactions && Array.isArray(retroSettings.periodicTransactions)) {
                 //  Determine if a periodic buy should occur here
                 for (let periodicTransaction of retroSettings.periodicTransactions) {
-                    if (funcs.shouldRunPeriodicTransaction(periodicTransaction, lastPeriodicTransactionRunTime)) {
+                    // We use the createdAt as the current time when evaluating, since the time records won't match time IRL
+                    if (funcs.shouldRunPeriodicTransaction(periodicTransaction, lastPeriodicTransactionRunTime, curPriceRecord.createdAt)) {
 
                         // Update the last run time on a per-period basis
                         lastPeriodicTransactionRunTime = curPriceRecord.createdAt;
@@ -156,7 +157,6 @@ module.exports = {
 
                                 limitOrder.completedOn = (new Date()).toDateString();
 
-                                // We only need to append the orderHistory if it is a purchase
                                 orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder, orderType: dict.orderTypes.BUY });
                             }
                         } else if (limitOrder.amountToSell) {
@@ -168,7 +168,7 @@ module.exports = {
 
 
                                 limitOrder.completedOn = (new Date()).toDateString();
-                                orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: symbolQuantityModification, price: curPriceRecord.price, limitOrder, orderType: dict.orderTypes.SELL });
+                                orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: periodicTransaction.quantity, price: curPriceRecord.price, limitOrder, orderType: dict.orderTypes.SELL });
                             }
                         }
                     }
@@ -189,6 +189,13 @@ module.exports = {
                 // This is where we would make an API call if it were a real system
                 finalLiquid += analyzedRecord.estimatedRevenue;
                 symbolTotal -= analyzedRecord.amountToSell;
+
+                orderHistoryForSymbol.push({
+                    symbol: retroSettings.symbol,
+                    quantity: analyzedRecord.amountToSell,
+                    price: curPriceRecord.price, 
+                    orderType: dict.orderTypes.SELL
+                });
             } 
             else // teehee this formatting is whimsically kitschy
             // TODO: Write tests for buying situations
@@ -196,7 +203,13 @@ module.exports = {
                 // This is where we would make an API call if it were a real system
                 finalLiquid -= analyzedRecord.estimatedCost;
                 symbolTotal += analyzedRecord.amountToBuy;
-               // orderHistoryForSymbol.push({ symbol: retroSettings.symbol, quantity: analyzedRecord.amountToSell, price: curPriceRecord.price });
+
+                orderHistoryForSymbol.push({
+                    symbol: retroSettings.symbol,
+                    quantity: analyzedRecord.amountToBuy,
+                    price: curPriceRecord.price, 
+                    orderType: dict.orderTypes.BUY
+                });
             }
 
         }

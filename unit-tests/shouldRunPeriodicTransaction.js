@@ -26,6 +26,39 @@
         assert.equal(result, true);
      });
 
+     it('should return false on a valid daily with prior records and a manual date that clash', function () {
+        const lastRunDate = new moment('2023-10-04T18:02:15.556595');
+        const result = funcs.shouldRunPeriodicTransaction({
+           orderType: dict.orderTypes.BUY,
+           units: dict.units.USD, 
+           quantity: 10, 
+           period: dict.periods.DAILY
+        }, lastRunDate, '2023-10-04T19:02:15.556595');
+        assert.equal(result, false);
+     });
+
+     it('should return true on a valid daily with prior records and a manual date that do not overlap', function () {
+        const lastRunDate = new moment('2023-10-04T18:02:15.556595');
+        const result = funcs.shouldRunPeriodicTransaction({
+           orderType: dict.orderTypes.BUY,
+           units: dict.units.USD, 
+           quantity: 10, 
+           period: dict.periods.DAILY
+        }, lastRunDate, '2023-10-06T19:02:15.556595');
+        assert.equal(result, true);
+     });
+
+     it('should return true on a valid daily with prior records and no manual date', function () {
+        const lastRunDate = new moment('2023-10-04T18:02:15.556595');
+        const result = funcs.shouldRunPeriodicTransaction({
+           orderType: dict.orderTypes.BUY,
+           units: dict.units.USD, 
+           quantity: 10, 
+           period: dict.periods.DAILY
+        }, lastRunDate);
+        assert.equal(result, true);
+     });
+
      it('should return true on a valid daily with prior records within a week', function () {
         const lastRunDate = new moment().subtract(6, 'day');
         const result = funcs.shouldRunPeriodicTransaction({

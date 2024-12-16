@@ -12,8 +12,9 @@ module.exports = {
         const allSales = _.filter(orderHistory, oh => oh.orderType === dict.orderTypes.SELL);
 
 
-        const totalSymbolAmount = _.sumBy(allBuys, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity) - _.sumBy(allSales, ph => Number.isNaN(ph.quantity) ? 0 : ph.quantity);
-        const totalSymbolCost = _.sumBy(allBuys, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity) - _.sumBy(allSales, ph => (Number.isNaN(ph.price) || Number.isNaN(ph.quantity)) ? 0 : ph.price * ph.quantity);
+        const totalSymbolAmount = _.sumBy(allBuys, ph => Number.isNaN(Number(ph.quantity)) ? 0 : Number(ph.quantity)) - _.sumBy(allSales, ph => Number.isNaN(Number(ph.quantity)) ? 0 : Number(ph.quantity));
+        const totalSymbolCost = _.sumBy(allBuys, ph => (Number.isNaN(Number(ph.price)) || Number.isNaN(Number(ph.quantity))) ? 0 : Number(ph.price) * Number(ph.quantity)) - _.sumBy(allSales, ph => (Number.isNaN(Number(ph.price)) || Number.isNaN(Number(ph.quantity))) ? 0 : Number(ph.price) * Number(ph.quantity));
+        const totalUSDProfit = totalSymbolCost * -1;
         // If there are no items in the array, it will otherwise divide by 0 and throw an exception
         const averagePrice = totalSymbolAmount ? totalSymbolCost/totalSymbolAmount : 0;
         return {
@@ -182,7 +183,7 @@ module.exports = {
         return date instanceof Date && !isNaN(date.valueOf());
     },
 
-    shouldRunPeriodicTransaction(periodicTransaction, lastPeriodRunTime) {
+    shouldRunPeriodicTransaction(periodicTransaction, lastPeriodRunTime, forceDateTime) {
         if (!periodicTransaction || typeof periodicTransaction !== 'object') {
             throw new Error('You must provide a periodicTransaction object');
         }
@@ -205,8 +206,10 @@ module.exports = {
             return true;
         }
 
-        const isWithinLast24Hours = moment().diff(moment(lastPeriodRunTime), 'hours') < 24;
-        const isWithinLastWeek = moment().diff(moment(lastPeriodRunTime), 'days') < 7;
+        // forceDateTime is used to that we can send in a value for testing. 
+        //  A null or undefined should just do a default moment()
+        const isWithinLast24Hours = moment(forceDateTime).diff(moment(lastPeriodRunTime), 'hours') < 24;
+        const isWithinLastWeek = moment(forceDateTime).diff(moment(lastPeriodRunTime), 'days') < 7;
 
         if (periodicTransaction.period === dict.periods.WEEKLY && isWithinLastWeek) {
             return false;
