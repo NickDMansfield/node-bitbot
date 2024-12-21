@@ -12,6 +12,7 @@
 */
 
 const _ = require('lodash');
+const dict = require('../dict');
 const funcs = require('../funcs/funcs');
 
 module.exports = {
@@ -49,7 +50,9 @@ module.exports = {
             processSettings.timeToEvaluate = lastRecord.createdAt;
         }
         console.log(averagePrice);
-        if (currentPrice > averagePrice) {
+        console.log(currentPrice);
+        // The 0 makes sure it doesn't attempt to set up 0-limits
+        if (currentPrice > averagePrice && totalSymbolAmount > 0) {
             if (processSettings.minimumProfitPercentToSell) {
                 const currentProfitPercent = (currentPrice / averagePrice) - 1; // 0.1 = 10%
                 if (currentProfitPercent >= processSettings.minimumProfitPercentToSell) {
@@ -62,8 +65,9 @@ module.exports = {
                     limitOrdersToSet.push({
                         symbol: processSettings.symbol,
                         // This is not a typo. We are moving the entire position
-                        amountToBuy: amountToSell,
+                        amountToBuy: totalSymbolAmount,
                         price: shortBuyPrice,
+                        orderType: dict.orderTypes.BUY
                     });
                 }
             }
